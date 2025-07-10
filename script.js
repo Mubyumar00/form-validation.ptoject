@@ -12,6 +12,35 @@ const form = document.getElementById('myForm');
 const green = '#4CAF50';
 const red = '#F44336';
 
+// Handle form submission
+form.addEventListener('submit', function(event) {
+    // prevent the default form submission behavior
+    event.preventDefault();
+    // validate the form fields
+    if (validateFirstName() && validateLastName() && validatePassword() && validateConfirmPassword() && validateEmail()) {
+        const name = firstName.value;
+        const container = document.querySelector('div.container');
+        const loader = document.createElement('div');
+        loader.className = 'progress';
+        const loadingBar = document.createElement>('div');
+        loadingBar.className = 'indeterminate';
+        loader.appendChild(loadingBar);
+        container.appendChild(loader);
+
+        setTimeout(function() {
+            const loaderDiv = document.querySelector('div.progress'); 
+            const panel = document.createElement('div');
+            panel.className = 'card-panel teal green'; 
+            const text = document.createElement('span');
+            text.className = 'white-text';
+            // set the text content of the span element 
+            text.appendChild(document.createTextNode(`Welcome ${name} to SocialApe, your form has been submitted successfully!`));
+            panel.appendChild(text);
+            container.replaceChild(panel, loaderDiv);
+        }, 1000);
+    }
+});
+
 // Validation functions
 function validateFirstName() {
     // check if the first name is empty
@@ -39,13 +68,34 @@ function validatePassword() {
     // check password against our character requirements
 
     // at least one uppercase letter, one lowercase letter, one number, and one special character
-    if (!containCharacters(password, 4)) return;
+    if (!containCharacters(password, 2)) return;
     return true;
     
 }
 
 function validateConfirmPassword() {
-    
+    if (password.className !== 'valid') {
+        setInvalid(confirmPassword, 'Password must be valid before confirming');
+        return;
+    } 
+    // if they match
+    if (password.value !== confirmPassword.value) {
+        setInvalid(confirmPassword, 'Passwords do not match');
+        return;
+    } else {
+        setValid(confirmPassword);
+        // return true;
+    }
+    return true;
+}
+
+function validateEmail() {
+    if (checkIfEmpty(email)) return;
+    // check if the email is valid
+    if (!containCharacters(email, 5)) return;
+    return true;   
+    // if it is not the case,
+        
 }
 
 // Utility functions
@@ -122,6 +172,13 @@ function containCharacters(field, code) {
             // Uppercase, lowercase, numbers and special characters
             regEx = /(?=.*\d)(?=.*[a-z])(?=.[A-Z])(?=.*\W)/;
             return matchWithRegEx(regEx, field, `${field.name} must contain at least one uppercase letter, one lowercase letter, one number and one special character`);
+        case 5:
+            // email
+            regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            // This regex checks for a valid email format
+            // It allows for letters, numbers, dots, underscores, and hyphens before the '@' symbol,
+            // followed by a domain name that can include letters, numbers, and hyphens, 
+            return matchWithRegEx(regEx, field, `${field.name} must be a valid email address`);
     
         default:
             return false;
